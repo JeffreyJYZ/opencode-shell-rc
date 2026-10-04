@@ -98,3 +98,10 @@ restarts. **Never restart or reload opencode yourself.**
 
 See `opencode-context/AGENTS.md` for the `E401`/dead-`.npmrc`-token trap on
 `npm stage publish` (same account).
+
+Note: `npm stage publish` leaves a `0.0.0-stage` version in the packument. It is
+the staging placeholder, not a ghost version — after `npm stage approve` the real
+version becomes `latest` and both entries appear in `versions`. Verify with the
+raw packument (`curl -sS https://registry.npmjs.org/@jeffreyjyz%2Fopencode-shell-rc`),
+not `npm view` — npm's local cache can lag and briefly report `0.0.0-stage` as
+`latest` even after a successful publish.
