@@ -60,6 +60,14 @@ No TUI half, no runtime dependencies (node builtins only).
   unit). Do not "improve" this into a command-string hack.
 - **`.zshenv` is always sourced for `zsh -c`; `.zshrc` never is.** That asymmetry
   is the entire exploit.
+- **Generation must pin `ZDOTDIR` to the real `HOME`.** `refreshIfStale` runs
+  `zsh -ic` with `env: { ...process.env, ZDOTDIR: home() }`. Without that, an
+  ambient `ZDOTDIR` — the plugin's own shim, inherited by a nested shell or by
+  `bun test` once the plugin is live in the agent shell — makes zsh read the
+  shim's rc instead of `~/.zshrc`: a feedback loop that regenerates the old
+  state (and broke the alias test, `zsh -ic` taking ~2.5s and reading the real
+  oh-my-zsh). Same pin on the `zcompile` call. The test is deliberately not the
+  only guard.
 - **Do not source the full rc.** `source ~/.zshrc` costs ~90ms and drags in
   oh-my-zsh/compinit/autosuggestions, which are interactive-only and useless in a
   non-interactive agent shell; `zsh -ic` also emits `(eval):1: can't change

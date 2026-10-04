@@ -93,6 +93,11 @@ export function refreshIfStale(): boolean {
 	const output = execFileSync("zsh", ["-ic", "alias -L; typeset -f"], {
 		encoding: "utf8",
 		stdio: ["ignore", "pipe", "ignore"],
+		// Pin ZDOTDIR to the real HOME. An ambient ZDOTDIR (this plugin's own
+		// shim, inherited by a nested shell or a test runner) would otherwise
+		// make zsh read the shim's rc — a feedback loop that regenerates the
+		// old state instead of the user's rc.
+		env: { ...process.env, ZDOTDIR: home() },
 		timeout: 20_000,
 	});
 	const temporary = `${state}.tmp`;
@@ -115,6 +120,7 @@ function compile(state: string): void {
 		rmSync(`${state}.zwc`, { force: true });
 		execFileSync("zsh", ["-c", 'zcompile "$1"', "zsh", state], {
 			stdio: ["ignore", "ignore", "ignore"],
+			env: { ...process.env, ZDOTDIR: home() },
 			timeout: 20_000,
 		});
 	} catch {
