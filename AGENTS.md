@@ -37,6 +37,14 @@ No TUI half, no runtime dependencies (node builtins only).
   command, but `zcompile` writes `state.zsh.zwc` which zsh prefers when newer and
   loads in ~0.5ms. Always `rm` the old `.zwc` first (it is read-only) and treat
   compilation as best effort — a missing `.zwc` just falls back to the text.
+- **The state is the *whole interactive environment*, oh-my-zsh included.** On the
+  author's machine `state.zsh` holds ~333 aliases and ~1492 functions — only 25
+  aliases and 1 function are hand-written in `~/.zshrc`; the rest come from
+  oh-my-zsh (the git plugin alone adds ~200 aliases, and oh-my-zsh defines ~1700
+  functions total). Numbers that large are **expected, not a bug** — the snapshot
+  faithfully reproduces what sourcing the rc yields, which was the point. If a
+  smaller payload is ever wanted, filter the serializer output to names defined in
+  the rc files; the current choice is deliberately "mirror the interactive shell".
 - **Fail open.** If zsh is missing or generation throws, `ZDOTDIR` is not set and
   the shell behaves exactly as before. Never fail the shell command.
 - **PATH/env are deliberately not snapshotted.** The agent inherits opencode's
