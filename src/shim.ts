@@ -90,16 +90,25 @@ export function refreshIfStale(): boolean {
 	const stateMtime = existsSync(state) ? statSync(state).mtimeMs : undefined;
 	const sourceMtimes = sourceFiles().map((file) => statSync(file).mtimeMs);
 	if (!needsRefresh(stateMtime, sourceMtimes)) return false;
-	const output = execFileSync("zsh", ["-ic", "alias -L; typeset -f"], {
-		encoding: "utf8",
-		stdio: ["ignore", "pipe", "ignore"],
-		// Pin ZDOTDIR to the real HOME. An ambient ZDOTDIR (this plugin's own
-		// shim, inherited by a nested shell or a test runner) would otherwise
-		// make zsh read the shim's rc — a feedback loop that regenerates the
-		// old state instead of the user's rc.
-		env: { ...process.env, ZDOTDIR: home() },
-		timeout: 20_000,
-	});
+
+	let output: string;
+	try {
+		output = execFileSync("zsh", ["-ic", "alias -L; typeset -f"], {
+			encoding: "utf8",
+			stdio: ["ignore", "pipe", "ignore"],
+			// Pin ZDOTDIR to the real HOME. An ambient ZDOTDIR (this plugin's own
+			// shim, inherited by a nested shell or a test runner) would otherwise
+			// make zsh read the shim's rc — a feedback loop that regenerates the
+			// old state instead of the user's rc.
+			env: { ...process.env, ZDOTDIR: home() },
+			timeout: 20_000,
+		});
+	} catch {
+		// No zsh on PATH (or it failed): leave the state absent, so the shim
+		// sources nothing and the shell behaves exactly as before. Fail open.
+		return false;
+	}
+
 	const temporary = `${state}.tmp`;
 	writeFileSync(
 		temporary,

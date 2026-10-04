@@ -46,7 +46,10 @@ No TUI half, no runtime dependencies (node builtins only).
   smaller payload is ever wanted, filter the serializer output to names defined in
   the rc files; the current choice is deliberately "mirror the interactive shell".
 - **Fail open.** If zsh is missing or generation throws, `ZDOTDIR` is not set and
-  the shell behaves exactly as before. Never fail the shell command.
+  the shell behaves exactly as before. Never fail the shell command. `refreshIfStale`
+  catches a missing/failing `zsh` itself and returns false, so `prepare()` still
+  lays down the shim (and the shim then sources nothing). CI runs on Ubuntu with
+  no `zsh`; the tests depend on this.
 - **PATH/env are deliberately not snapshotted.** The agent inherits opencode's
   start-up environment. Document that a `.zshrc` `PATH` change needs an opencode
   restart; alias/function changes self-refresh.

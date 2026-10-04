@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -81,6 +87,20 @@ describe("prepare", () => {
 		prepare();
 		expect(stateDir()).toStartWith(join(dir, "state"));
 		expect(stateFile().startsWith(join(dir, "state"))).toBe(true);
+	});
+
+	test("fails open when zsh is not on PATH", () => {
+		writeFileSync(join(dir, ".zshrc"), "alias gp='echo FAKE_PUSH'\n");
+		const savedPath = process.env.PATH;
+		// Point PATH at an empty dir so `zsh` cannot be found — generation must
+		// not throw (CI has no zsh), and prepare() should still lay down the shim.
+		mkdirSync(join(dir, "empty-bin"));
+		process.env.PATH = join(dir, "empty-bin");
+		try {
+			expect(() => prepare()).not.toThrow();
+		} finally {
+			process.env.PATH = savedPath;
+		}
 	});
 
 	const hasZsh = Bun.which("zsh") !== null;
