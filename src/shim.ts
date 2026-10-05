@@ -23,6 +23,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { LINKED } from "./constants/shell-rc";
 
 /** Read `HOME` per call so tests can point it at a temp directory. */
 const home = (): string => process.env.HOME ?? homedir();
@@ -54,9 +55,6 @@ export function shimContent(): string {
 		"",
 	].join("\n");
 }
-
-/** Real rc files a nested interactive/login shell would look for under ZDOTDIR. */
-const LINKED = [".zshrc", ".zprofile", ".zlogin"] as const;
 
 export function isZsh(shell: string): boolean {
 	return /(^|[\\/])zsh(\.exe)?$/.test(shell);

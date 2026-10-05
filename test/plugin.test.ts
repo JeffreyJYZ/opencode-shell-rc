@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Plugin as PluginNs } from "@opencode/plugin";
+import { SHELL_RC_ID } from "../src/constants/shell-rc";
 import plugin, { shellRcPlugin } from "../src/index";
 import { type ShellCreateBefore, stateDir } from "./helpers";
 
@@ -45,7 +46,7 @@ async function register(): Promise<(event: ShellCreateBefore) => unknown> {
 
 describe("plugin shape", () => {
 	test("exposes id and setup", () => {
-		expect(plugin.id).toBe("opencode-shell-rc");
+		expect(plugin.id).toBe(SHELL_RC_ID);
 		expect(typeof plugin.setup).toBe("function");
 	});
 });

@@ -4,7 +4,7 @@
  * refreshed only when the rc changes, so per-command cost stays ~0ms.
  */
 import type { Plugin as PluginNs } from "@opencode/plugin";
-import { SHELL_RC_ID } from "./ids";
+import { SHELL_RC_ID } from "./constants/shell-rc";
 import { isZsh, prepare, stateDir } from "./shim";
 
 export const shellRcPlugin: PluginNs.Plugin = {

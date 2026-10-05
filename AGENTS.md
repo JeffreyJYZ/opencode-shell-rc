@@ -9,10 +9,10 @@ code with them (the shim idea is independent).
 ## Layout
 
 ```
-src/index.ts   server half (v2 `{ id, setup }`): the `shell.create.before` hook
-src/shim.ts    the shim: stateDir, shimContent, needsRefresh, prepare, refresh
-src/ids.ts     plugin id /= state dir name
-index.js       root shim for local-directory plugin loading (see Traps)
+src/index.ts               server half (v2 `{ id, setup }`): the `shell.create.before` hook
+src/shim.ts                the shim: stateDir, shimContent, needsRefresh, prepare, refresh
+src/constants/shell-rc.ts  plugin id and linked rc file names
+index.js                   root shim for local-directory plugin loading (see Traps)
 ```
 
 No TUI half, no runtime dependencies (node builtins only).
